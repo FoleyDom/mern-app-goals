@@ -38,6 +38,7 @@ const registerUser = asyncHandler(async (req, res) => {
             _id: user.id,
             name: user.name,
             email: user.email,
+            //Only really need token
             token: generateToken(user._id),
         })
     } else {
