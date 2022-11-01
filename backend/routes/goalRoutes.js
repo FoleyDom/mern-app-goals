@@ -3,8 +3,10 @@ const { set } = require('mongoose')
 const router = express.Router()
 const { getGoals, setGoal, updateGoal, deletetGoal } = require('../controllers/goalController')
 
-router.route('/').get(getGoals).post(setGoal)
-router.route('/:id').delete(deletetGoal).put(updateGoal)
+const { protect } = require('../middleware/authMiddleware')
+
+router.route('/').get(protect, getGoals).post(protect, setGoal)
+router.route('/:id').delete(protect, deletetGoal).put(protect, updateGoal)
 
 // router.get('/', getGoals)
 
