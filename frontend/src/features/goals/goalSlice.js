@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import goalService from './goalService'
 
 const initialState = {
     goals: [],
@@ -15,7 +16,35 @@ export const createGoal = createAsyncThunk('goals/create', async (goalData, thun
         return await goalService.createGoal(goalData, token)
     } catch (error) {
         const message =
-            (error.reponse && error.reponse.data && error.reponse.data.message) ||
+            (error.response && error.response.data && error.response.data.message) ||
+            error.message ||
+            error.toString()
+        return thunkAPI.rejectWithValue(message)
+    }
+})
+
+// Get user goals
+export const getGoals = createAsyncThunk('goals/getAll', async (_, thunkAPI) => {
+    try {
+        const token = thunkAPI.getState().auth.user.token
+        return await goalService.getGoals(token)
+    } catch (error) {
+        const message =
+            (error.response && error.response.data && error.response.data.message) ||
+            error.message ||
+            error.toString()
+        return thunkAPI.rejectWithValue(message)
+    }
+})
+
+// Delete user goal
+export const deleteGoal = createAsyncThunk('goals/delete', async (id, thunkAPI) => {
+    try {
+        const token = thunkAPI.getState().auth.user.token
+        return await goalService.deleteGoal(id, token)
+    } catch (error) {
+        const message =
+            (error.response && error.response.data && error.response.data.message) ||
             error.message ||
             error.toString()
         return thunkAPI.rejectWithValue(message)
@@ -28,42 +57,49 @@ export const goalSlice = createSlice({
     reducers: {
         reset: (state) => initialState,
     },
+    extraReducers: (builder) => {
+        builder
+            .addCase(createGoal.pending, (state) => {
+                state.isLoading = true
+            })
+            .addCase(createGoal.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.isSuccess = true
+                state.goals.push(action.payload)
+            })
+            .addCase(createGoal.rejected, (state, action) => {
+                state.isLoading = false
+                state.isError = true
+                state.message = action.payload
+            })
+            .addCase(getGoals.pending, (state) => {
+                state.isLoading = true
+            })
+            .addCase(getGoals.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.isSuccess = true
+                state.goals = action.payload
+            })
+            .addCase(getGoals.rejected, (state, action) => {
+                state.isLoading = false
+                state.isError = true
+                state.message = action.payload
+            })
+            .addCase(deleteGoal.pending, (state) => {
+                state.isLoading = true
+            })
+            .addCase(deleteGoal.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.isSuccess = true
+                state.goals = state.goals.filter((goal) => goal._id !== action.payload.id)
+            })
+            .addCase(deleteGoal.rejected, (state, action) => {
+                state.isLoading = false
+                state.isError = true
+                state.message = action.payload
+            })
+    },
 })
-//     extraReducers: (builder) => {
-//         builder
-//             .addCase(register.pending, (state) => {
-//                 state.isLoading = true
-//             })
-//             .addCase(register.fulfilled, (state, action) => {
-//                 state.isLoading = false
-//                 state.isSuccess = true
-//                 state.user = action.payload
-//             })
-//             .addCase(register.rejected, (state, action) => {
-//                 state.isLoading = false
-//                 state.isError = true
-//                 state.message = action.payload
-//                 state.user = null
-//             })
-//             .addCase(login.pending, (state) => {
-//                 state.isLoading = true
-//             })
-//             .addCase(login.fulfilled, (state, action) => {
-//                 state.isLoading = false
-//                 state.isSuccess = true
-//                 state.user = action.payload
-//             })
-//             .addCase(login.rejected, (state, action) => {
-//                 state.isLoading = false
-//                 state.isError = true
-//                 state.message = action.payload
-//                 state.user = null
-//             })
-//             .addCase(logout.fulfilled, (state) => {
-//                 state.user = null
-//             })
-//     },
-// })
 
 export const { reset } = goalSlice.actions
 export default goalSlice.reducer

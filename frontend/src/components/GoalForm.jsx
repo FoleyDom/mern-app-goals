@@ -3,14 +3,14 @@ import { useDispatch } from 'react-redux'
 import { createGoal } from '../features/goals/goalSlice'
 
 function GoalForm() {
-    const [text, setText] = useState()
+    const [text, setText] = useState('')
 
     const dispatch = useDispatch()
 
     const onSubmit = (e) => {
         e.preventDefault()
 
-        dispatch(createGoal({ test }))
+        dispatch(createGoal({ text }))
         setText('')
     }
 
@@ -29,7 +29,7 @@ function GoalForm() {
                 </div>
                 <div className="form-group">
                     <button className="btn btn-block" type="submit">
-                        Add Goals
+                        Add Goal
                     </button>
                 </div>
             </form>
