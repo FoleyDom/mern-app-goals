@@ -111,7 +111,7 @@ function Register() {
                             id="password2"
                             name="password2"
                             value={password2}
-                            placeholder="Confrim password"
+                            placeholder="Confirm password"
                             onChange={onChange}
                         />
                     </div>
